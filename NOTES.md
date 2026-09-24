@@ -1,4 +1,6 @@
-# 23/09/2026
+# NOTES LOG
+
+## 23/09/2026
 
 Needed to convert the DD/MM/YYYY to ISO format for sorting etc on SQLite.
 
@@ -15,3 +17,7 @@ With string formatting a user could type something that closes the quote and the
 The column list existed in three places, usecols, the row building line and the insert statement. This means that changes have to be made in all three places to work. This was fixed by deleting a line of code that converted the array into tuples which added nothing and also built 9 columns instead of 10.
 
 In the future code should be used that takes the shape of the data from the original piece of data e.g len(seasons) instead of range(5).
+
+## 24/09/2026
+
+Used SQL queries in DB browser to verify if the csv loader worked correctly. Compared Away and Home win records for Chelsea over each season to online databases e.g FOTMOB.

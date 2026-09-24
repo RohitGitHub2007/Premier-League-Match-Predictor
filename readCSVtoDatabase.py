@@ -21,6 +21,10 @@ for i in range(len(seasons)):
     df = pd.read_csv(fr"C:\Users\rohit\Projects\Premier-League-Match-Predictor\Premier-League-CSVs\PL{seasons[i]}.csv", usecols=["Date","HomeTeam","AwayTeam","FTHG","FTAG","FTR","B365H","B365D","B365A"])
     df["Season"] = seasons[i]
     
+    #Changes date to ISO format
+    df["Date"] = (pd.to_datetime(df["Date"], format = r'%d/%m/%Y')).dt.strftime(r"%Y-%m-%d")
+    
+    
     #puts the data into each database and commits
     #returns as an array
     dataRows = df.values.tolist()
