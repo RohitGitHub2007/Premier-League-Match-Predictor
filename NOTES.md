@@ -24,7 +24,7 @@ Used SQL queries in DB browser to verify if the csv loader worked correctly. Com
 
 ## 26/09/2026
 
-Created the calculateElo.py file. Implemented setup for a new table called TeamEloRatings to store each teams elo on a particular date after a game. 
+Created the calculateElo.py file. Implemented setup for a new table called TeamEloRatings to store each teams elo on a particular date after a game.
 
 Made a loop to loop through every entry in the PremSeasonData table adn calculate elo up to that entry as well as add it to the TeamELoRating table to preserve the history of each team's elo rating and how it changed over the seasons.
 
