@@ -18,6 +18,6 @@ homeAdvantage = 0
 for Season, Date, HomeTeam, AwayTeam, ftr in cursor:
     print(Season, Date, HomeTeam, AwayTeam, ftr)
     
-    cursor.execute("INSERT")
+    #cursor.execute("INSERT")
     
 connection.close()
