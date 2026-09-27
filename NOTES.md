@@ -29,3 +29,15 @@ Created the calculateElo.py file. Implemented setup for a new table called TeamE
 Made a loop to loop through every entry in the PremSeasonData table adn calculate elo up to that entry as well as add it to the TeamELoRating table to preserve the history of each team's elo rating and how it changed over the seasons.
 
 Need to decide how to handle relegated and promoted teams' elo rating tommorrow.
+
+## 27/09/2026
+
+Implemented elo formula to calculate expected elo rating and elo rating after the match. Also implemented code to create a table called teamEloRatings which stores every elo update for every team across every season. This way we can see how a teams' elo rating changes thoughout each season.
+
+Decided to use a hashMap called teamsElo to store each team and their elo rating. This way elos for specific teams can be preserved as they get relegated and promoted. Newly promoted teams still start with a base elo rating of 1500. This will have to be remedied as it is expected for a newly promoted team to have a lower elo rating than average.
+
+Used eloratings.net/about to find a way to implement victoryMarginMultiplier (K factor). K factor affects how much a single match moves a rating. In this system goal difference also affects how much the match moves the rating.
+
+Used a k factor of 15 to ensure ratings were affected more by recent results but not too high of a value such that elo was influenced heavily by a short run of good form or lucky wins for each team.
+
+Considering using more csv files of older premier league seasons the create more accurate predictions and elo ratings.
