@@ -41,3 +41,9 @@ Used eloratings.net/about to find a way to implement victoryMarginMultiplier (K 
 Used a k factor of 15 to ensure ratings were affected more by recent results but not too high of a value such that elo was influenced heavily by a short run of good form or lucky wins for each team.
 
 Considering using more csv files of older premier league seasons the create more accurate predictions and elo ratings.
+
+## 29/09/2026
+
+Decided to add previous seasons to create a more accurate model/prediction starting from the 2002-03 season. (Specifically chose this as it was when data on B365 odds started to be stored).
+
+Added in a temporary resolution to the promoted teams' starting elo. When they enter the league they start with 1350 elo(roughly what a relegated teams' elo sits at). However this method is not perfect and with change the total sum of the leagues Elo ratings. Will have to remedy this later by adjusting every team in that current seasons' rating slightly.

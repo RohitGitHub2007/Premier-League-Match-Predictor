@@ -35,13 +35,26 @@ decayRate = 0.693
 
 for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     
+    #skips if any of these fields are null (means game was cancelled)
+    if HomeTeam is None or AwayTeam is None:
+        continue
     
-    #adds teams that arent already in the hashMap and assign them a default rating of 1500
+    if fthg is None or ftag is None:
+        continue
+    
+    
+    #adds teams that arent already in the hashMap and assigns them a default rating of 1350
+    #unless the teams were in the original 20 they start off with a league average of 1500
     if HomeTeam not in teamsElo:
         teamsElo[HomeTeam] = 1500
+    elif HomeTeam not in teamsElo and len(teamsElo) == 20:
+        teamsElo[HomeTeam] = 1350
+        
         
     if AwayTeam not in teamsElo:
         teamsElo[AwayTeam] = 1500
+    elif AwayTeam not in teamsElo and len(teamsElo) == 20:
+            teamsElo[AwayTeam] = 1350
         
     victoryMargin = abs(fthg - ftag)
     
@@ -72,10 +85,18 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     elif ftr == "D":
         resultH = 0.5
         resultA = 0.5
+        
+    prevRatingH = teamsElo[HomeTeam]
+    prevRatingA = teamsElo[AwayTeam]
     
     #elo rating updates after the match
     teamsElo[HomeTeam] = teamsElo[HomeTeam] + (effectiveVictoryMarginMultiplier * (resultH - expectedEloHome))
     teamsElo[AwayTeam] = teamsElo[AwayTeam] + (effectiveVictoryMarginMultiplier * (resultA - expectedEloAway))
+    
+    changeH = abs(teamsElo[HomeTeam] - prevRatingH)
+    changeA = abs(teamsElo[AwayTeam] - prevRatingA)
+    
+    assert math.isclose(changeH, changeA, abs_tol = 0)
     
     #countes number of matches since model started. Helps weight recent matches more than previous matches.
     matches += 1
