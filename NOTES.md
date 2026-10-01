@@ -47,3 +47,14 @@ Considering using more csv files of older premier league seasons the create more
 Decided to add previous seasons to create a more accurate model/prediction starting from the 2002-03 season. (Specifically chose this as it was when data on B365 odds started to be stored).
 
 Added in a temporary resolution to the promoted teams' starting elo. When they enter the league they start with 1350 elo(roughly what a relegated teams' elo sits at). However this method is not perfect and with change the total sum of the leagues Elo ratings. Will have to remedy this later by adjusting every team in that current seasons' rating slightly.
+
+## 01/10/2026
+
+Implemented loader for the test season csv and have started on the file responsible for calculating probabilites
+
+Decided the draw probability should be decided based on the rating gap between the two teams.
+Another option considered was a constant draw rate. This idea was rejected because it doesn't simulate the fact that teams with a bigger rating gap are less likely to draw in real life and vice versa.
+
+This would need pre-match ratings which arent stored in a database as of now, so that would need to be implemented into the pipeline at the moment the pre-match ratings are calculated.
+
+Currently leaning towards keeping calculations as probabilities and then converting the bookmaker odds into probabilities for comparison.
