@@ -18,9 +18,10 @@ cursor.execute("SELECT Season, Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR FROM Pr
 #inititalizing variables, hashMaps
 teamsElo  = {}
 scaleFactor = 400
-homeAdvantage = 400
+homeAdvantage = 80
 matches = 1
 kfactor = 15
+currentTeams = set()
 
 #initializing dataframe for TeamEloRatings
 columnNames = ['Season', 'Date', 'Team', 'Elo']
@@ -46,15 +47,17 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     #adds teams that arent already in the hashMap and assigns them a default rating of 1350
     #unless the teams were in the original 20 they start off with a league average of 1500
     if HomeTeam not in teamsElo:
-        teamsElo[HomeTeam] = 1500
-    elif HomeTeam not in teamsElo and len(teamsElo) == 20:
-        teamsElo[HomeTeam] = 1350
-        
-        
+        if len(teamsElo) >= 20:
+            teamsElo[HomeTeam] = 1350
+        else:
+            teamsElo[HomeTeam] = 1500
+    
     if AwayTeam not in teamsElo:
-        teamsElo[AwayTeam] = 1500
-    elif AwayTeam not in teamsElo and len(teamsElo) == 20:
+        if len(teamsElo) >= 20:
             teamsElo[AwayTeam] = 1350
+        else:
+            teamsElo[AwayTeam] = 1500
+    
         
     victoryMargin = abs(fthg - ftag)
     
