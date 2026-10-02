@@ -6,14 +6,18 @@ import pandas as pd
 connection = sqlite3.connect(r'C:\Users\rohit\Projects\Premier-League-Match-Predictor\PremierLeagueDatabase.db')
 
 #a cursor allows traversal of the database
-cursor = connection.cursor()
+cursor1 = connection.cursor()
 
 #creates the table and columns for TeamEloRatings which stores every teams elo rating on every date the played.
-cursor.execute("DROP TABLE IF EXISTS TeamEloRatings")
-cursor.execute("CREATE TABLE IF NOT EXISTS TeamEloRatings ('Season' TEXT, 'Date' DATE, 'Team' TEXT, 'Elo' FLOAT)")
+cursor1.execute("DROP TABLE IF EXISTS TeamEloRatings")
+cursor1.execute("CREATE TABLE IF NOT EXISTS TeamEloRatings ('Season' TEXT, 'Date' DATE, 'Team' TEXT, 'Elo' FLOAT)")
+
+#creates the table and columns for logistic regression model to accurately predict win, draw, loss probabilities
+cursor1.execute("DROP TABLE IF EXISTS EloDifferenceAndOutcome")
+cursor1.execute("CREATE TABLE IF NOT EXISTS EloDifferenceAndOutcome ('EloDifference' FLOAT, 'MatchOutcome' INT)")
 
 #SQL statement to select from the PremSeasonData table
-cursor.execute("SELECT Season, Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR FROM PremSeasonData")
+cursor1.execute("SELECT Season, Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR FROM PremSeasonData")
 
 #inititalizing variables, hashMaps
 teamsElo  = {}
@@ -27,6 +31,9 @@ currentTeams = set()
 columnNames = ['Season', 'Date', 'Team', 'Elo']
 df = pd.DataFrame(columns = columnNames)
 
+columnNames2 = ['EloDifference', 'MatchOutcome']
+df2 = pd.DataFrame(columns = columnNames2)
+
 
 
 #decayRate influences how quickly older matches are forgotten (0.1 = very quickly, 0.01 = very slowly)
@@ -34,7 +41,7 @@ decayRate = 0.693
 
 
 
-for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
+for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor1:
     
     #skips if any of these fields are null (means game was cancelled)
     if HomeTeam is None or AwayTeam is None:
@@ -57,7 +64,29 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
             teamsElo[AwayTeam] = 1350
         else:
             teamsElo[AwayTeam] = 1500
+            
+    #decides result for elo calculation and also decides match outcome for home team
+    if ftr == "A":
+        resultH = 0
+        resultA = 1
+        matchOutcome = 0
+        
+    elif ftr == "H":
+        resultH = 1
+        resultA = 0
+        matchOutcome = 2
     
+    elif ftr == "D":
+        resultH = 0.5
+        resultA = 0.5
+        matchOutcome = 1
+        
+    #calculate pre-match elo difference for home team    
+    preMatchEloDifference = teamsElo[HomeTeam] - teamsElo[AwayTeam]
+    
+    
+    #create the dataframe for EloDifferenceAndOutcome table
+    df2.loc[len(df2)] = [preMatchEloDifference, matchOutcome]
         
     victoryMargin = abs(fthg - ftag)
     
@@ -79,15 +108,7 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     expectedEloHome = 1 / (1 + pow(10,(teamsElo[AwayTeam] - (teamsElo[HomeTeam] + homeAdvantage))/scaleFactor))
     expectedEloAway =  1 - expectedEloHome
     
-    if ftr == "A":
-        resultH = 0
-        resultA = 1
-    elif ftr == "H":
-        resultH = 1
-        resultA = 0
-    elif ftr == "D":
-        resultH = 0.5
-        resultA = 0.5
+    
         
     prevRatingH = teamsElo[HomeTeam]
     prevRatingA = teamsElo[AwayTeam]
@@ -115,9 +136,14 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     
     #cursor.execute("INSERT")
     
-#insert data from the dataframe in TeamEloRatings table    
+#insert data from the dataframe into TeamEloRatings table    
 dataRows = df.values.tolist()
-cursor.executemany("INSERT INTO TeamEloRatings ('Season', 'Date', 'Team', 'Elo') VALUES (?, ?, ?, ?)", dataRows)
+cursor1.executemany("INSERT INTO TeamEloRatings ('Season', 'Date', 'Team', 'Elo') VALUES (?, ?, ?, ?)", dataRows)
+connection.commit()
+
+#insert data from the second dataframe into EloDifferenceAndOutcome table
+dataRows = df2.values.tolist()
+cursor1.executemany("INSERT INTO EloDifferenceAndOutcome ('EloDifference', 'MatchOutcome') VALUES (?,?)", dataRows)
 connection.commit()
     
 connection.close()

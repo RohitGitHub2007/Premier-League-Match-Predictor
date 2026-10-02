@@ -58,3 +58,19 @@ Another option considered was a constant draw rate. This idea was rejected becau
 This would need pre-match ratings which arent stored in a database as of now, so that would need to be implemented into the pipeline at the moment the pre-match ratings are calculated.
 
 Currently leaning towards keeping calculations as probabilities and then converting the bookmaker odds into probabilities for comparison.
+
+## 02/10/2026
+
+Decided upon using a logistic regression model to decide win, draw and loss probabilities. This involves creating a python script that look at all the historic data (mainly elo differences before games and what the outcomes of these games were) and then find three values.
+
+The first value is the beta which usually takes the form of a tiny decimal number. This measures how much the pre-match rating gap matters in the league.
+
+The second is the loss/draw boundary. A match on this boundary has a 50% chance of an away win and the further left of it a match is, the higher that chance.
+
+The third is the draw/win boundary. A match on this boundary has a 50% chance of a home win and the further right of it a match is, the higher that chance. A match between the two boundaries has a higher chance of a draw than a match outside them.
+
+Implemented a python script to get all three of the above values. Used statsmodels library for the ordered logistic regression model. The model was fitted on historic premier league data from 2002/2003 to 2024/2025.
+
+Implemented probability formulas in calculateProbabilities.py and stored the data into the PredictedProbabilities table.
+
+Ran an AVG() function on the PredictedProbabilities table and found that the predicted average Draw Probability was 0.248(24.8%) when comparing this to various actual league statistic websites online it was found that the draw rate for that season was 0.273(27.3%) which shows that the model is calibrated.
