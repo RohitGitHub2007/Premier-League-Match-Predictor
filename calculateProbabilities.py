@@ -10,7 +10,7 @@ cursor = connection.cursor()
 
 #creates the table and columns for TeamEloRatings which stores every teams elo rating on every date the played.
 cursor.execute("DROP TABLE IF EXISTS PredictedProbabilities")
-cursor.execute("CREATE TABLE IF NOT EXISTS PredictedProbabilities ('Season' TEXT, 'Date' DATE, 'HomeTeam' TEXT, 'AwayTeam' TEXT, 'HomeProbability' DECIMAL(3, 2), 'DrawProbability' DECIMAL(3, 2), 'AwayProbability' DECIMAL(3, 2))")
+cursor.execute("CREATE TABLE IF NOT EXISTS PredictedProbabilities ('Season' TEXT, 'Date' DATE, 'HomeTeam' TEXT, 'AwayTeam' TEXT, 'HomeProbability' DECIMAL(3, 2), 'DrawProbability' DECIMAL(3, 2), 'AwayProbability' DECIMAL(3, 2), 'FTR' CHAR)")
 
 #store each teams elo rating before the latest season in a hashMap
 cursor.execute("SELECT Team, Elo FROM TeamEloRatings")
@@ -23,7 +23,7 @@ for Team, Elo in cursor:
 #SQL statement to select from the PremSeasonData table
 cursor.execute("SELECT Season, Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR FROM PremSeason20252026")
 
-columnNames = ['Season', 'Date', 'HomeTeam', 'AwayTeam', 'HomeProbability', 'DrawProbability', 'AwayProbability']
+columnNames = ['Season', 'Date', 'HomeTeam', 'AwayTeam', 'HomeProbability', 'DrawProbability', 'AwayProbability', 'FTR']
 df = pd.DataFrame(columns = columnNames)
 
 
@@ -96,7 +96,8 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     
     homeWinProb = 1 - awayWinAndDrawProb
     
-    df.loc[len(df)] = [Season, Date, HomeTeam, AwayTeam, homeWinProb, drawProb, awayWinProb]
+    
+    df.loc[len(df)] = [Season, Date, HomeTeam, AwayTeam, homeWinProb, drawProb, awayWinProb, ftr]
     
     
     #----------------------------------------------------------------------------------------------------------    
@@ -134,7 +135,7 @@ for Season, Date, HomeTeam, AwayTeam, fthg, ftag, ftr in cursor:
     changeA = abs(teamsElo[AwayTeam] - prevRatingA)
     
 dataRows = df.values.tolist()
-cursor.executemany("INSERT INTO PredictedProbabilities ('Season', 'Date', 'HomeTeam', 'AwayTeam', 'HomeProbability', 'DrawProbability', 'AwayProbability') VALUES (?, ?, ?, ?, ?, ?, ?)", dataRows)
+cursor.executemany("INSERT INTO PredictedProbabilities ('Season', 'Date', 'HomeTeam', 'AwayTeam', 'HomeProbability', 'DrawProbability', 'AwayProbability', 'FTR') VALUES (?, ?, ?, ?, ?, ?, ?, ?)", dataRows)
 connection.commit()
 
 connection.close()

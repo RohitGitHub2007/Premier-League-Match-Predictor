@@ -74,3 +74,19 @@ Implemented a python script to get all three of the above values. Used statsmode
 Implemented probability formulas in calculateProbabilities.py and stored the data into the PredictedProbabilities table.
 
 Ran an AVG() function on the PredictedProbabilities table and found that the predicted average Draw Probability was 0.248(24.8%) when comparing this to various actual league statistic websites online it was found that the draw rate for that season was 0.273(27.3%) which shows that the model is calibrated.
+
+## 04/10/2026
+
+Implemented the Brier score calculator. Used a baseline score (probability of each outcome was divided equally), a score based on the frequency of each outcome from previous seasons, a score based on the current elo prediction system and a score based on bet365 odds (converted into probabilities). Due to the bookmakers adding an overround (extra profit margins added by bookmakers so that the house wins in the long term) the regular 1/odds values were not usable and so to get the probability (which sums to 1), each value was divided by the total combined value for the three skewed probabilities to normalize them.
+
+From the results it is determined that the system outperforms the equal probability baseline and the frequency baseline. Although the score was close to that of bet365's it was slightly worse. This may be due to bookmakers taking into account more advanced data such as player injuries, xG, xA etc.
+
+It was decided that tuning to the system should be stopped after the brier score for the 2025/26 season was calculated, this was to avoid purposely changing the system to lower the brier score. Doing this would make it more accurate for the specific test season but it may not be what applies best to future seasons.
+
+Some remaining weak spots in the system:
+
+The promoted and relegated teams do not cleanly exchange elo and so the total elo for all the teams combined slightly varies from season to season.
+
+The k-factor, home advantage and starting elo were all picked based on what was commonly used online and suggested for a project like this. They are not as specific to this system as they could be.
+
+There is only one test season, we don't know how this system compares to the bookmakers in future seasons and if the model itself is consistently accurate for multiple seasons or only the specific test season. More seasons can be tested in the future.
