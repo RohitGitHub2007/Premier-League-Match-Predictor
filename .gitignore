@@ -3,5 +3,4 @@ __pycache__/
 *.pyc
 .env
 *.db
-Premier-League-CSVs/*.csv
 LEARNING.md
